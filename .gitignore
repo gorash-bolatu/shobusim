@@ -1,0 +1,9 @@
+*.txt
+*.log
+*.exe
+*.pdb
+*.pcu
+*.opt
+*.sh
+*.bat
+*.xml
