@@ -73,7 +73,6 @@ procedure ObjectionSplash(const message: string);
 begin
     var maxwidth := 19 - message.Length mod 2;
     var top, mid, bot: StringBuilder;
-    Console.ResetColor;
     try
         top := new StringBuilder;
         mid := new StringBuilder;
@@ -88,8 +87,8 @@ begin
             1: 
                 begin
                     mid.Append('|');
-                    top.Append(FiftyFifty('|\', ' _'));
-                    bot.Append(FiftyFifty('|/', ' ‾'));
+                    top.Append(FiftyFifty('/\', ' _'));
+                    bot.Append(FiftyFifty('\/', ' ‾'));
                 end;
             2:
                 begin
@@ -121,8 +120,8 @@ begin
             1: 
                 begin
                     mid.Append('|');
-                    if (top.LastChar = '/') then top.Append('|');
-                    if (bot.LastChar = '\') then bot.Append('|');
+                    if (top.LastChar = '/') then top.Append('\');
+                    if (bot.LastChar = '\') then bot.Append('/');
                 end;
             2:
                 begin
@@ -135,6 +134,7 @@ begin
                     end;
                 end;
         end; // case end
+        TxtClr(Color.White);
         Draw.Ascii(top.ToString, mid.ToString, bot.ToString);
     finally
         if (top <> nil) then

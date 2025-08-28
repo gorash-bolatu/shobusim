@@ -5,5 +5,7 @@ const
     VERSION: string = 'Alpha v4';
     VERSION_nth: string = 'шестнадцатая';
     DEBUGMODE: boolean = True;
+var
+    SKIPCHATS: boolean := True;
 
 end.

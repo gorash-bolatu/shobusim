@@ -15,8 +15,8 @@ var
 
 implementation
 
-uses Aliases, Procs, Chat, Inventory, Items, Menu, Anim, ButtonMashers, Dialogue,
-    Actors, Achs, Matrix, Tutorial;
+uses Aliases, Procs, Chats, Inventory, Items, Menu, Anim, ButtonMashers, Dialogue,
+    Actors, Achs, Matrix, Tutorial, Battle, _Settings;
 
 var
     Route: (SOLO, RITA, TRIP, ROMA);
@@ -31,7 +31,7 @@ var
     played_megamuzhik, programmed, used_empty_hdd, saw_matrix, texted_trip, tried_texting_rita: boolean;
     
     {$REGION чаты}
-    procedure chat_prompt;
+    procedure PrintChatPrompt;
     begin
         print('Кому ты напишешь?');
         if not TextedVasya then print('Васе?');
@@ -45,32 +45,32 @@ var
         writeln('Или никому?');
     end;
     
-    procedure Chats;
+    procedure ChatWithFriends;
     begin
-        writeln('О, сейчас несколько твоих корешей находятся в сети!');
+        writeln('Сейчас несколько твоих корешей находятся в сети.');
         writeln('Это Вася - странноватый помешанный на энергетиках торчок...');
         writeln('Трип - немного загадочный и вечно сонливый чудак...');
         writeln('Рита - девушка, которая тебе... а... ну...');
         writeln('И Рома - главный чел на районе; его знают все пацаны с Чертанова.');
         writeln('Кому ты напишешь?');
-        while True do
-        begin// while begin
+        var cht: Chat;
+        repeat
             ReadCmd('написать');
             case LastCmdResult of // case2 begin
                 'VASYA':
                     if TextedVasya then writeln('Ты уже писал Васе!') else
                     begin
-                        Chat.Name := ('Вася');
-                        Chat.DrawTop;
-                        Chat.Enter('Привет вась че как');
-                        Chat.Response('отстаньте от меняяяяяяяяф');
-                        Chat.Enter('Оу');
-                        Chat.Response('блииииииин мне оч пльхо', 'я слтшком многр энергосов выпил походу');
-                        Chat.Enter('Че у тебя опять передоз');
-                        Chat.Response('да ты зкдолбааааал');
-                        Chat.Enter('Понятно');
-                        Chat.Response('слушпй давай не сцгодня а');
-                        Chat.Enter('Ладно тогда пока');
+                        cht := new Chat('Вася');
+                        cht.DrawTop;
+                        cht.Enter('Привет вась че как');
+                        cht.Response('отстаньте от меняяяяяяяяф');
+                        cht.Enter('Оу');
+                        cht.Response('блииииииин мне оч пльхо', 'я слтшком многр энергосов выпил походу');
+                        cht.Enter('Че у тебя опять передоз');
+                        cht.Response('да ты зкдолбааааал');
+                        cht.Enter('Понятно');
+                        cht.Response('слушпй давай не сцгодня а');
+                        cht.Enter('Ладно тогда пока');
                         writelnx2;
                         TextedVasya := True;
                         writeln('По-видимому, сегодня у Васи не очень хороший день.');
@@ -78,26 +78,26 @@ var
                 'TRIP':
                     if texted_trip then writeln('Ты уже писал Трипу!') else
                     begin
-                        Chat.Name := ('ТРNПАН0С0М03');
-                        Chat.DrawTop;
-                        Chat.Enter('Привет трип че как');
-                        Chat.Response('Привет, всё отлично.', 'Правда, проснулся совсем недавно.');
-                        Chat.Enter('Эх твой режим сна как всегда');
-                        Chat.Response('Хе-хе.', 'Ладно, говори, что там по новостям.');
+                        cht := new Chat('ТРNПАН0С0М03');
+                        cht.DrawTop;
+                        cht.Enter('Привет трип че как');
+                        cht.Response('Привет, всё отлично.', 'Правда, проснулся совсем недавно.');
+                        cht.Enter('Эх твой режим сна как всегда');
+                        cht.Response('Хе-хе.', 'Ладно, говори, что там по новостям.');
                         if TextedRoma then
                         begin
-                            Chat.Enter('Мы с ромой собрались на тусу');
-                            Chat.Response('На стоянке которая?');
-                            Chat.Enter('Погоди откуда ты знаешь');
-                            Chat.Response('Он мне писал, позвал прийти.', 'А что, звучит хайпово.');
-                            Chat.Enter('То есть ты тоже идёшь');
-                            Chat.Response('Угу.');
+                            cht.Enter('Мы с ромой собрались на тусу');
+                            cht.Response('На стоянке которая?');
+                            cht.Enter('Погоди откуда ты знаешь');
+                            cht.Response('Он мне писал, позвал прийти.', 'А что, звучит хайпово.');
+                            cht.Enter('То есть ты тоже идёшь');
+                            cht.Response('Угу.');
                         end
                         else begin
-                            Chat.Enter('Хм ну вообще новостей нет');
-                            Chat.Response('Понимаю.', 'Давай в ТЦ пойдём, что ли. Встречаемся у гаражей.');
+                            cht.Enter('Хм ну вообще новостей нет');
+                            cht.Response('Понимаю.', 'Давай в ТЦ пойдём, что ли. Встречаемся у гаражей.');
                         end;
-                        Chat.Enter('Ок звучит неплохо давай');
+                        cht.Enter('Ок звучит неплохо давай');
                         writelnx2;
                         texted_trip := True;
                         if not TextedRoma then writeln('Ты договорился встретиться с Трипом у гаражей.');
@@ -105,24 +105,24 @@ var
                 'ROMA', 'ROMA_ROMA':
                     if TextedRoma then writeln('Ты уже писал Роме!') else
                     begin
-                        Chat.Name := ('Рома Кафератор');
-                        Chat.DrawTop;
-                        Chat.Enter('Привет рома че как');
-                        Chat.Response('ЙОУ ДОРОВА БЛЯТЬ', 'КАРОЧ');
-                        Chat.Enter('Что');
-                        Chat.Response('СЕГОДНЯ ЧЕТКАЯ ТУСА НА ПАРКОВКЕ', 'ГО');
-                        Chat.Enter('И что за туса');
-                        Chat.Response('НУ БЛЯ ВСЕ НАШИ ПАЦАНЫ СОБИРАЮТСЯ', 'МУЗЛО БАДЯГА ДЕВКИ САСНЫЕ ВСЕ ДЕЛА');
-                        Chat.Enter('Ну не знаю');
-                        Chat.Response('ДА МЛЯ ПРИХОДИ НОРМ ТЕМА');
-                        Chat.Enter('Ладно');
-                        Chat.Response('ЗАЕБИСЬ ТАМ НА МЕСТЕ ВСТРЕТИМСЯ');
+                        cht := new Chat('Рома Кафератор');
+                        cht.DrawTop;
+                        cht.Enter('Привет рома че как');
+                        cht.Response('ЙОУ ДОРОВА БЛЯТЬ', 'КАРОЧ');
+                        cht.Enter('Что');
+                        cht.Response('СЕГОДНЯ ЧЕТКАЯ ТУСА НА ПАРКОВКЕ', 'ГО');
+                        cht.Enter('И что за туса');
+                        cht.Response('НУ БЛЯ ВСЕ НАШИ ПАЦАНЫ СОБИРАЮТСЯ', 'МУЗЛО БАДЯГА ДЕВКИ САСНЫЕ ВСЕ ДЕЛА');
+                        cht.Enter('Ну не знаю');
+                        cht.Response('ДА МЛЯ ПРИХОДИ НОРМ ТЕМА');
+                        cht.Enter('Ладно');
+                        cht.Response('ЗАЕБИСЬ ТАМ НА МЕСТЕ ВСТРЕТИМСЯ');
                         if texted_trip then
                         begin
-                            Chat.Enter('Слушай а я с трипом уже договорился');
-                            Chat.Response('ООО НИШТЯК ОН ТОЖЕ ИДЕТ?');
-                            Chat.Enter('Пока не знаю');
-                            Chat.Response('Я С НИМ ПОБАЗАРЮ ПРО ЭТО', 'КАРОЧ ДО СВЯЗИ');
+                            cht.Enter('Слушай а я с трипом уже договорился');
+                            cht.Response('ООО НИШТЯК ОН ТОЖЕ ИДЕТ?');
+                            cht.Enter('Пока не знаю');
+                            cht.Response('Я С НИМ ПОБАЗАРЮ ПРО ЭТО', 'КАРОЧ ДО СВЯЗИ');
                         end;
                         writelnx2;
                         TextedRoma := True;
@@ -133,37 +133,37 @@ var
                     if TextedRita then writeln('Ты уже писал Рите!')
                     else if TextedRoma then
                     begin
-                        Chat.Name := ('Маргарита Тесакова');
-                        Chat.DrawTop;
-                        Chat.DrawSides;
+                        cht := new Chat('Маргарита Тесакова');
+                        cht.DrawTop;
+                        cht.DrawSides;
                         TxtClr(Color.Blue);
                         writeln('Вы');
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         writeln('Привет рита че как');
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         writeln('Рита');
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         writeln('Алееее че как там');
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         writeln;
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         TxtClr(Color.Blue);
-                        writeln(Chat.Name);
-                        Chat.DrawSides;
+                        writeln(cht.Name);
+                        cht.DrawSides;
                         TxtClr(Color.White);
                         writeln('привет :) занята была');
-                        Chat.DrawSides;
+                        cht.DrawSides;
                         writeln;
-                        Chat.Enter('Рома написал что сегодня на парковке будет туса');
-                        Chat.Response('?');
-                        Chat.Enter('Там все пацаны с района собираются');
-                        Chat.Response('какие ещё пацаны :/');
-                        Chat.Enter('Да они нормальные');
-                        Chat.Response('хорошо но причём здесь я');
-                        Chat.Enter('Ну я иду прост хочешь со мной');
-                        Chat.Response('нуууууууу ._.');
-                        Chat.Enter('Короче если хочешь приходи туда');
-                        Chat.Response('ок я подумаю (-~-)');
+                        cht.Enter('Рома написал что сегодня на парковке будет туса');
+                        cht.Response('?');
+                        cht.Enter('Там все пацаны с района собираются');
+                        cht.Response('какие ещё пацаны :/');
+                        cht.Enter('Да они нормальные');
+                        cht.Response('хорошо но причём здесь я');
+                        cht.Enter('Ну я иду прост хочешь со мной');
+                        cht.Response('нуууууууу ._.');
+                        cht.Enter('Короче если хочешь приходи туда');
+                        cht.Response('ок я подумаю (-~-)');
                         writelnx2;
                         TextedRita := True;
                         writeln('Получается, Рита согласилась пойти с тобой?');
@@ -182,12 +182,12 @@ var
             begin
                 ClearLine(True);
                 writeln('Итак, ты написал всем корешам, кто сейчас онлайн.');
-                Chat.Skip := True;
+                SKIPCHATS := True;
                 break;
             end
-            else chat_prompt;
-        end; //while end
-        Chat.Name := nil;
+            else PrintChatPrompt;
+        until False;
+        cht := nil;
     end;
     {$ENDREGION}
     
@@ -213,7 +213,7 @@ var
             Menu.Load(torrenting_movies ? 'отойти от компьютера' : 'выключить компьютер');
             Menu.UnloadSelect;
             case Menu.LastResult of // case begin
-                {-} 'написать друзьям': Chats;
+                {-} 'написать друзьям': ChatWithFriends;
                 {-} 'смотреть рутуб':
                     begin
                         writeln('Ты открываешь Рутуб и проверяешь раздел "В тренде".');
@@ -473,7 +473,7 @@ begin
     writeln('Тебе также нравится смотреть видео на Рутубе (в том числе обзоры на плохие российские фильмы).');
     writeln;
     writeln('Сейчас ты стоишь посреди своей комнаты.');
-    writeln('В ней есть кровать, шкаф, окно, ящик с барахлом и стол.');
+    writeln('В ней есть кровать, шкаф с уличной одеждой, окно, ящик с барахлом и стол.');
     writeln('На столе ноутбук и недопитая тобой вчерашняя бутылка колы.');
     writeln('Что ты будешь делать?');
     if not Tutorial.CommandH.Shown then

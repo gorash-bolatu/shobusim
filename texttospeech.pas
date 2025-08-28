@@ -108,7 +108,8 @@ begin
         end;
         ClrKeyBuffer;
         ReadKey;
-        writeln(TAB);
+        write(' ');
+        Anim.Next1;
         Cursor.GoTop(-1);
         if DO_TTS then
             case synth.IsSpeaking of
@@ -124,11 +125,10 @@ begin
     var clr_scr_tmr: MyTimers.Timer;
     try
         try
-            clr_scr_tmr := new MyTimers.Timer(1, ClrScr); // стирает странные ошибки типа "Untested Windows version detected"
+            clr_scr_tmr := new MyTimers.Timer(1, ClrScr); // стирает странные ошибки типа "Untested Windows version"
             clr_scr_tmr.Enable;
             synth := new System.Speech.Synthesis.SpeechSynthesizer;
-            var voices := synth.GetInstalledVoices;
-            var voices_ru := voices.&Where(q -> q.IsRus);
+            var voices_ru := synth.GetInstalledVoices.&Where(q -> q.IsRus);
             if not voices_ru.Any then exit;
             var selected_voice: InstalledVoice := voices_ru.FirstOrDefault(q -> q.IsMale);
             if (selected_voice = nil) then selected_voice := voices_ru.First;
@@ -150,6 +150,7 @@ begin
             clr_scr_tmr.Destroy;
             clr_scr_tmr := nil;
         end;
+        if not DO_TTS then Dispose;
         CollectGarbage;
     end;
 end;

@@ -8,7 +8,7 @@
     <Item Type="SourceFile" Name="actors.pas" Path="actors.pas" />
     <Item Type="SourceFile" Name="anim.pas" Path="anim.pas" />
     <Item Type="SourceFile" Name="battle.pas" Path="battle.pas" />
-    <Item Type="SourceFile" Name="chat.pas" Path="chat.pas" />
+    <Item Type="SourceFile" Name="chats.pas" Path="chats.pas" />
     <Item Type="SourceFile" Name="cursor.pas" Path="cursor.pas" />
     <Item Type="SourceFile" Name="dialogue.pas" Path="dialogue.pas" />
     <Item Type="SourceFile" Name="draw.pas" Path="draw.pas" />

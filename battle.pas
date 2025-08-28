@@ -31,6 +31,10 @@ procedure HitEnemy(damage: byte);
 procedure HitSelf(damage: byte);
 /// восстановить игроку health пунктов здоровья (только визуально)
 procedure HealSelf(health: byte);
+/// остались ли пункты здоровья у игрока
+function SelfAlive: boolean;
+/// остались ли пункты здоровья у врага
+function EnemyAlive: boolean;
 
 
 
@@ -78,6 +82,8 @@ type
         procedure Visualize;
         procedure Revisualize;
         procedure EraseDicks;
+        property SelfHealth: byte read self_hp;
+        property EnemyHealth: byte read enemy_hp;
     end;
 // TYPE END
 
@@ -120,9 +126,9 @@ begin
     Throw(() ->
     begin
         MoveCursorToMsgPoint;
-        if (time.TotalSeconds > 3) then TxtClr(Color.Yellow)
-        else if (time <= TimeSpan.Zero) then TxtClr(Color.Red)
-        else TxtClr((time.Milliseconds mod 250 > 125) ? Color.Magenta : Color.Yellow);
+        if (time <= TimeSpan.Zero) then TxtClr(Color.Red)
+        else if (time.TotalSeconds < 3) and (time.Milliseconds mod 250 > 125) then TxtClr(Color.Magenta)
+        else TxtClr(Color.Yellow);
         write(time <= TimeSpan.Zero ? '00.00' : time.ToString('ss\.ff'));
     end);
 end;
@@ -386,15 +392,18 @@ end;
 
 function Upscaled(change: shortint; scale: word): string;
 begin
-    var zeroes: byte := 1;
-    case (scale div Abs(change)) of
-        0, 1: zeroes := 3;
-        2, 3: zeroes := 2;
-    end; // case end
-    var a := Round(10 ** zeroes);
-    var b := a * 10 - 1;
     Result := (change > 0) ? '+' : '-';
-    Result += Random(a, b).ToString;
+    if Abs(change) > scale then Result += '9999'
+    else begin
+        var zeroes: byte := 1;
+        case (scale div Abs(change)) of
+            1: zeroes := 3;
+            2, 3: zeroes := 2;
+        end; // case end
+        var a := Round(10 ** zeroes);
+        var b := a * 10 - 1;
+        Result += Random(a, b).ToString;
+    end;
 end;
 
 procedure CritMsg;
@@ -531,5 +540,9 @@ procedure HitEnemy(damage: byte) := current.DamageEnemy(damage);
 procedure HitSelf(damage: byte) := current.DamageSelf(damage);
 
 procedure HealSelf(health: byte) := current.MendSelf(health);
+
+function SelfAlive: boolean := (current.SelfHealth > 0);
+
+function EnemyAlive: boolean := (current.EnemyHealth > 0);
 
 end.
