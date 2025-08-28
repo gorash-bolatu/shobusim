@@ -395,10 +395,11 @@ begin
     Result := (change > 0) ? '+' : '-';
     if Abs(change) > scale then Result += '9999'
     else begin
-        var zeroes: byte := 1;
+        var zeroes: byte;
         case (scale div Abs(change)) of
-            1: zeroes := 3;
-            2, 3: zeroes := 2;
+            1, 2: zeroes := 3;
+            3, 4: zeroes := 2;
+        else zeroes := 1;
         end; // case end
         var a := Round(10 ** zeroes);
         var b := a * 10 - 1;

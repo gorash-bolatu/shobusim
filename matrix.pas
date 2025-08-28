@@ -3,7 +3,8 @@
 interface
 
 procedure Mtrx;
-procedure NextSlide;
+
+
 
 implementation
 
@@ -13,10 +14,10 @@ uses _Log, _Settings;
 function RandChar: char;
 begin
     case Random(4) of
-        0: Result := chrunicode(Random(33, 126));
-        1: Result := chrunicode(Random(454, 788));
-        2: Result := chrunicode(Random(9478, 9580));
-        3: Result := chrunicode(Random(48, 57))
+        0: Result := ChrUnicode(Random(33, 126));
+        1: Result := ChrUnicode(Random(454, 788));
+        2: Result := ChrUnicode(Random(9478, 9580));
+        3: Result := ChrUnicode(Random(48, 57))
     end; // case end
 end;
 

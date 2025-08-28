@@ -24,6 +24,8 @@ type
 procedure DisplayAll;
 function DebugString: string;
 
+
+
 implementation
 
 uses Aliases, Cursor, Procs, Anim;
@@ -33,9 +35,12 @@ var
 
 function DebugString: string;// todo убрать когда не будет log'ов
 begin
-    foreach a: Achievement in ListOfAll do
-        if a.fAchieved then Result += ('; ' + a.fName.Replace(' ', ''));
-    if not NilOrEmpty(Result) then Result := 'ach-s: ' + Result[3:];
+    var lst := new List<string>;
+    foreach a: Achievement in ListOfAll.&Where(q -> q.fAchieved) do
+        lst.Add(a.fName.Remove(' '));
+    if (lst.Count > 0) then Result := 'ach-s: ' + lst.JoinToString('; ');
+    lst.Clear;
+    lst := nil;
 end;
 
 procedure Achievement.Achieve := if not self.fAchieved then self.fAchieved := True;
