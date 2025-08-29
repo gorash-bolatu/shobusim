@@ -229,18 +229,16 @@ begin
     sprite := sprite.Prepend(' ' * max_len).ToArray;
     DoWithoutUpdScr(() ->
     begin
-        UpdScr;
         var original_cur_top: integer := Cursor.Top;
         var original_win_top: integer := Console.WindowTop;
-        var altitude: integer := Console.WindowTop + Console.WindowHeight - Cursor.Top;
-        while (Cursor.Top < Console.WindowTop + Console.WindowHeight) do
+        var altitude: () -> integer := () -> (Console.WindowTop + Console.WindowHeight - Cursor.Top);
+        UpdScr;
+        while (altitude > 0) do
         begin
-            if (altitude > sprite.Length - 1) then Draw.Ascii(sprite)
-            else if (altitude < sprite.Length) then Draw.EraseLine(max_len)
-            else Draw.Ascii(sprite[0:(altitude - 1)]);
+            Draw.Ascii(sprite);
             Cursor.GoTop(+1);
             Console.WindowTop := original_win_top;
-            sleep(80);
+            sleep(80 div (altitude div MIN_HEIGHT + 1));
         end;
         Console.CursorTop := original_cur_top;
         UpdScr;
