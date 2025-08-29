@@ -50,10 +50,12 @@ function PadCenter(const s: string; n: integer): string;
 function FiftyFifty<T>(a, b: T): T;
 /// сборка мусора вручную
 procedure CollectGarbage;
-/// ввод + парсинг команды
+/// ввод + парсинг команды с подсказкой prompt
 procedure ReadCmd(prompt: string := '');
 /// последний сохранённый результат успешно введённой команды
 function LastCmdResult: string;
+/// возвращает ввёденную строку с подсказкой prompt
+function ReadInput(prompt: string := ''): string;
 /// обёртка для комнат побега
 procedure EscapeRoom(proc: procedure);
 /// принудительно перевести windows в спящий режим
@@ -215,7 +217,7 @@ end;
 
 procedure ReadCmd(prompt: string);
 const
-    nonalpha: array of char = ('!', '"', '#', '№', '$', '%', '&', '''', '(', ')', '*',
+    NONALPHA: array of char = ('!', '"', '#', '№', '$', '%', '&', '''', '(', ')', '*',
     '+', '-', ',', '.', ':', ';', '<', '=', '>', '?', '@', '^', '`', '{', '}', '~',
     '_', '[', ']', '/', '|', '\', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
 var
@@ -263,9 +265,8 @@ begin
             break
         end;
         for var r: integer := 1 to res.Length do
-            if nonalpha.Contains(res[r]) then res[r] := #127;
-        res := res.Remove(#127);
-        res := res.Trim.ToLower;
+            if NONALPHA.Contains(res[r]) then res[r] := #127;
+        res := res.Remove(#127).Trim.ToLower;
         while (res.Contains('  ')) do res := res.Replace('  ', ' ');
         res := res.Replace('ё', 'е').Replace('тся', 'ться');
         res := ParseCmd(res);
@@ -279,6 +280,47 @@ begin
 end;
 
 function LastCmdResult: string := cmdres;
+
+function ReadInput(prompt: string): string;
+begin
+    writelnx2;
+    ClearLine(True);
+    var original_top: integer := Cursor.Top;
+    repeat
+        TxtClr(Color.Gray);
+        print('>');
+        if not NilOrEmpty(prompt) then print(prompt);
+        ClrKeyBuffer;
+        Cursor.Show;
+        Result := ComputeWithoutUpdScr(() -> ReadlnString);
+        Cursor.Hide;
+        try
+            Result := Result.TrimEnd(#10, #13);
+        except
+            on exc: Exception do
+            begin
+                _Log.Log('!! ошибка: ' + exc.GetType.ToString);
+                TxtClr(Color.Red);
+                writeln('// Ошибка: ', exc.GetType, '.');
+                writeln;
+                continue
+            end
+        end; // try end
+        Result := Result.Replace(TAB, ' ').RegexReplace('[\u0000-\u001F]', '').Trim;
+        if NilOrEmpty(Result) then
+            repeat
+                ClearLine(True);
+            until (Cursor.Top <= original_top)
+        else break;
+    until False;
+    writeln;
+    _Log.Log('> ' + Result);
+    if NilOrEmpty(prompt) then _Log.Log($'[{Result}]')
+    else _Log.Log($'(префикс:"{prompt}") [{Result}]');
+    TxtClr(Color.White);
+    prompt := nil;
+end;
+
 
 procedure Catch(const ex: Exception);
 begin
