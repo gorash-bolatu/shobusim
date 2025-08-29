@@ -7,9 +7,9 @@ type
     private
         fStatus: boolean := False;
     public
-        procedure Show() := fStatus := True;
         property Shown: boolean read fStatus;
-    end;// record end
+        procedure Show() := if not fStatus then fStatus := True;
+    end;// class end
 
 var
     CommandH, InventoryH, MenuH, ElevatorH, LookAroundH, AnimNextH, DialogueH, ChatH: Hint;

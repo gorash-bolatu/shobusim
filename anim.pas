@@ -13,12 +13,11 @@ procedure TakeThat;
 procedure Slash(left, top: integer; dir: Direction);
 procedure Falling(params sprite: array of string);
 
+
+
 implementation
 
 uses Aliases, Procs, Tutorial, Cursor, Draw;
-
-const
-    BACKSPACE: string = #8#32#8;
 
 procedure Text(const s: string; delay: word);
 begin
@@ -30,11 +29,14 @@ begin
 end;
 
 procedure Next1;
+const
+    BACKSPACE: string = #8#32#8;
+    DELAY: word = 330;
 begin
     ClrKeyBuffer;
     var cycle: boolean;
     repeat
-        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, 330);
+        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, DELAY);
         if KeyAvail then break else write(cycle ? BACKSPACE : '>');
         cycle := not cycle;
     until False;
@@ -43,6 +45,8 @@ begin
 end;
 
 procedure Next3;
+const
+    DELAY: byte = 240;
 begin
     writeln;
     if not Tutorial.AnimNextH.Shown then
@@ -55,8 +59,8 @@ begin
     ClrKeyBuffer;
     var len: byte;
     repeat
-        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, 240);
-        if KeyAvail or (len = 3) then write(BACKSPACE * len) else write('>');
+        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, DELAY);
+        if KeyAvail or (len = 3) then ClearLine(False) else write('>');
         if len = 3 then len := 0 else len += 1;
     until KeyAvail;
     if not Tutorial.AnimNextH.Shown then

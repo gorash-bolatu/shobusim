@@ -59,18 +59,18 @@ type
         itemres: Item?;
         self_name, enemy_name: string;
         visible_enemy_name, visible_self_name: string;
-        enemy_hp, self_hp: byte;
+        enemy_hp, self_hp: shortint;
         enemy_hp_max, self_hp_max: byte;
         message_point: (integer, integer);
-        topleft_point: integer;
+        hp_bars_topleft: integer;
         
         static function BuildCommands(const special: string): array of string;
         static function BuildSubmenu: array of string;
         procedure MoveCursorToMsgPoint;
         procedure MoveCursorToStartingPoint;
         procedure PrintTime(const time: TimeSpan);
-        static procedure DrawDick(const name: string; namecolor: Color; width, hp: byte);
-        procedure DrawDicks;
+        static procedure DrawHpBar(const name: string; namecolor: Color; width, hp: byte);
+        procedure DrawHpBars;
         procedure EraseMsg;
     public
         constructor Create(const player_name: string; hp1: byte; const opponent_name: string; hp2: byte);
@@ -81,9 +81,9 @@ type
         procedure MendSelf(hp: byte);
         procedure Visualize;
         procedure Revisualize;
-        procedure EraseDicks;
-        property SelfHealth: byte read self_hp;
-        property EnemyHealth: byte read enemy_hp;
+        procedure EraseHpBars;
+        property SelfHealth: shortint read self_hp;
+        property EnemyHealth: shortint read enemy_hp;
     end;
 // TYPE END
 
@@ -118,7 +118,7 @@ end;
 procedure Instance.MoveCursorToStartingPoint;
 begin
     Cursor.SetLeft(0);
-    Cursor.SetTop(topleft_point);
+    Cursor.SetTop(hp_bars_topleft);
 end;
 
 procedure Instance.PrintTime(const time: TimeSpan);
@@ -133,7 +133,7 @@ begin
     end);
 end;
 
-static procedure Instance.DrawDick(const name: string; namecolor: Color; width, hp: byte);
+static procedure Instance.DrawHpBar(const name: string; namecolor: Color; width, hp: byte);
 begin
     TxtClr(Color.White);
     var left_offset: smallint := (width - name.Length) div 2;
@@ -158,26 +158,26 @@ begin
     write('└', '─' * width, '┘');
 end;
 
-procedure Instance.DrawDicks;
+procedure Instance.DrawHpBars;
 begin
     while (Cursor.Top + MIN_HEIGHT > Console.WindowTop + Console.WindowHeight)
-    and (Console.WindowTop < topleft_point) do
+    and (Console.WindowTop < hp_bars_topleft) do
     begin
         Console.WindowTop += 1;
         sleep(4);
     end;
-    DrawDick(visible_self_name, Color.Green, self_hp_max, self_hp);
+    DrawHpBar(visible_self_name, Color.Green, self_hp_max, self_hp);
     MoveCursorToMsgPoint;
     Cursor.GoXY(+5, -2);
-    DrawDick(visible_enemy_name, Color.Red, enemy_hp_max, enemy_hp);
+    DrawHpBar(visible_enemy_name, Color.Red, enemy_hp_max, enemy_hp);
     writeln;
 end;
 
 procedure Instance.Visualize;
 begin
     Anim.Next3;
-    topleft_point := Cursor.Top;
-    DrawDicks;
+    hp_bars_topleft := Cursor.Top;
+    DrawHpBars;
     Throw(() ->
     begin
         MoveCursorToMsgPoint;
@@ -197,18 +197,18 @@ end;
 
 procedure Instance.Revisualize;
 begin
-    EraseDicks;
-    topleft_point := Cursor.Top;
+    EraseHpBars;
+    hp_bars_topleft := Cursor.Top;
     message_point := (self_hp_max + 2, Cursor.Top + 2);
-    DrawDicks;
+    DrawHpBars;
 end;
 
-procedure Instance.EraseDicks;
+procedure Instance.EraseHpBars;
 begin
     Anim.Next3;
     Throw(() ->
     begin
-        Cursor.SetTop(topleft_point);
+        Cursor.SetTop(hp_bars_topleft);
         ClearLines(5, True);
         TxtClr(Color.DarkGray);
         writeln('─┘');
@@ -366,7 +366,6 @@ begin
         EraseMsg;
     end;
     TxtClr(Color.Gray);
-    _Log.Log($'= меню: [{point}] {options[point]}');
     if not submenu then
     begin
         case options[point] of
@@ -388,6 +387,7 @@ begin
     end;
     writeln;
     TxtClr(Color.White);
+    _Log.Log($'= битва: {selectres} [{itemres}]');
 end;
 
 function Upscaled(change: shortint; scale: word): string;
@@ -448,6 +448,7 @@ begin
         Cursor.GoLeft(-dmg);
         write(' ' * dmg);
     end);
+    _Log.Log($'= self_hp: {self_hp}->{self_hp-dmg}');
     self_hp -= dmg;
     EraseMsg;
 end;
@@ -476,6 +477,7 @@ begin
         Cursor.GoLeft(-dmg);
         write(' ' * dmg);
     end);
+    _Log.Log($'= enemy_hp: {enemy_hp}->{enemy_hp-dmg}');
     enemy_hp -= dmg;
     EraseMsg;
 end;
@@ -500,6 +502,7 @@ begin
         Cursor.GoLeft(-hp);
         write(Instance.SQUARE * hp);
     end);
+    _Log.Log($'= self_hp: {self_hp}->{self_hp+hp}');
     self_hp += hp;
     EraseMsg;
 end;
@@ -531,7 +534,7 @@ end;
 
 procedure Finish;
 begin
-    current.EraseDicks;
+    current.EraseHpBars;
     current.Destroy;
     current := nil;
 end;
