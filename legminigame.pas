@@ -8,7 +8,8 @@ function Survived: boolean;
 
 implementation
 
-uses Aliases, Procs, Draw, Anim, Cursor, _Log;
+uses Aliases, Procs, Draw, Anim, Cursor, Achs;
+uses _Log;
 
 var
     failed_attempts: byte;
@@ -92,7 +93,7 @@ var
     k1, k2: Key;
     left_hand: byte := WIDTH div 2 - MIN_GAP;
     right_hand: byte := left_hand + MIN_GAP;
-    leg_position: byte := left_hand + 3;
+    leg_position: byte := left_hand + 3 + Random(-MIN_GAP, +MIN_GAP);
     leg_delay: word := 20 + (1 shl failed_attempts);
     leg_is_going_right: boolean;
     attack_stage: byte;
@@ -116,12 +117,24 @@ var
         write((right_hand + 5 = WIDTH) ? '│' : ' ');
     end;
     
+    procedure DrawLeg;
+    begin
+        if leg_is_going_right then Draw.Ascii(' │ │   ',
+                                              ' │ └─┐ ',
+                                              ' └───┘ ')
+        else Draw.Ascii('   │ │ ',
+                        ' ┌─┘ │ ',
+                        ' └───┘ ');
+    end;
+    
     procedure UpdateGrip(grip_change: shortint);
     begin
         while (grip + grip_change > MAX_HP) do grip_change -= 1;
         while (grip + grip_change < 0) do grip_change += 1;
         grip += grip_change;
-        Cursor.SetLeft(WIDTH + 8);
+        Cursor.SetLeft(WIDTH + 7);
+        TxtClr(Color.Gray);
+        write('│');
         TxtClr(Color.Green);
         write('█' * grip);
         if (grip_change <> 0) and (grip > 0) then
@@ -236,7 +249,7 @@ begin
                         begin
                             if (attack_stage = 2) then BeepAsync(900, stage_delay);
                             TxtClr(Color.Red);
-                            write(' ↓ ↓ ↓');
+                            write(' V V V');
                         end;
                     3, 5, 7: write(' ' * 6);
                     8:
@@ -244,11 +257,10 @@ begin
                             BeepAsync(300, stage_delay);
                             Cursor.GoTop(-3);
                             TxtClr(Color.Red);
-                            Draw.Ascii('       ',
-                                       ' │ │   ',
-                                       ' │ └─┐ ',
-                                       ' └───┘ ');
-                            Cursor.GoXY(+1, +4);
+                            Draw.EraseLine(7);
+                            Cursor.GoTop(+1);
+                            DrawLeg;
+                            Cursor.GoXY(+1, +3);
                             write('X' * 5);
                             Cursor.GoTop(-1);
                         end;
@@ -257,11 +269,10 @@ begin
                             Cursor.GoTop(-3);
                             hurt := False;
                             TxtClr(Color.Yellow);
-                            Draw.Ascii(' │ │   ',
-                                       ' │ └─┐ ',
-                                       ' └───┘ ',
-                                       '       ');
-                            Cursor.GoXY(+1, +4);
+                            DrawLeg;
+                            Cursor.GoTop(+3);
+                            Draw.EraseLine(7);
+                            Cursor.GoXY(+1, +1);
                             TxtClr(Color.Gray);
                             DrawEdge;
                             Cursor.GoTop(+1);
@@ -282,8 +293,8 @@ begin
                 last_time_damaged := DateTime.Now;
                 Cursor.GoTop(-3);
                 case stage_delay of
-                    0..20: UpdateGrip(-3);
-                    21..80: UpdateGrip(-2);
+                    0..49: UpdateGrip(-3);
+                    50..80: UpdateGrip(-2);
                 else UpdateGrip(-1);
                 end;
                 Result := False;
@@ -313,13 +324,13 @@ begin
             Cursor.GoTop(-8);
             Cursor.SetLeft(leg_position);
             TxtClr(Color.Yellow);
-            Draw.Ascii(' │ │   ',
-                       ' │ └─┐ ',
-                       ' └───┘ ',
-                       PadCenter(time_to_stomp.Subtract(DateTime.Now).ToString('s\.f'), 7));
-            Cursor.GoTop(+8);
+            DrawLeg;
+            Cursor.GoTop(+3);
+            Draw.Text(PadCenter(time_to_stomp.Subtract(DateTime.Now).ToString('s\.f'), 7));
+            Cursor.GoTop(+5);
         end;
     end;
+    if (SecondsPassed >= 60) then Achs.ClapYourHands.Achieve;
     _Log.Log('leg evading time: ' + DateTime.Now.Subtract(start_time).ToString);
     hurt := False;
     ClearLine(False);
@@ -336,14 +347,15 @@ begin
     begin
         TxtClr(Color.Yellow);
         Cursor.GoTop(-5);
+        leg_is_going_right := (leg_position < right_hand);
         while not (leg_position in right_hand..(right_hand + MIN_GAP div 2)) do
         begin
             Cursor.SetLeft(leg_position);
-            Draw.Ascii(' │ │   ',
-                       ' │ └─┐ ',
-                       ' └───┘ ',
-                       '       ');
-            if (leg_position < right_hand) then leg_position += 1 else leg_position -= 1;
+            DrawLeg;
+            Cursor.GoTop(+3);
+            Draw.EraseLine(7);
+            Cursor.GoTop(-3);
+            if leg_is_going_right then leg_position += 1 else leg_position -= 1;
             sleep(10);
         end;
         Cursor.SetLeft(right_hand + 1);
@@ -357,14 +369,28 @@ begin
         Cursor.GoXY(-5, +1);
         Draw.EraseLine(5);
         Cursor.GoTop(-4);
-        sleep(80);
+        sleep(50);
         BeepAsync(700, 300);
         DrawHandGrabbingA;
         Cursor.GoXY(-5, +1);
         TxtClr(Color.Gray);
         DrawEdge;
-        sleep(300);
+        sleep(400);
+        Cursor.GoTop(-6);
+        TxtClr(Color.Yellow);
+        loop 8 do
+        begin
+            if leg_position < (left_hand + MIN_GAP) then leg_position += 1
+            else if leg_position > (right_hand + MIN_GAP div 2) then leg_position -= 1
+            else leg_position += FiftyFifty(-1, +1);
+            Cursor.SetLeft(leg_position);
+            if leg_is_going_right then Cursor.GoLeft(-1);
+            DrawLeg;
+            sleep(30);
+        end;
+        Cursor.GoTop(-1);
         writeln;
+        sleep(500);
     end
     else begin
         DrawHands;
@@ -401,9 +427,8 @@ begin
         Anim.Falling('\ | /' + ' ' * (HandsGap - MIN_GAP) + '\ | /',
                      ' \|/ ' + ' ' * (HandsGap - MIN_GAP) + ' \|/ ',
                      '  |  ' + ' ' * (HandsGap - MIN_GAP) + '  |  ');
-        
+        Cursor.GoTop(-7);
     end;
-    Cursor.GoTop(-7);
     sleep(500);
     ClearLines(9, True);
     TxtClr(Color.White);

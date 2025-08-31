@@ -258,7 +258,7 @@ begin
             Draw.Ascii(sprite);
             Cursor.GoTop(+1);
             Console.WindowTop := original_win_top;
-            sleep(80 div (altitude div MIN_HEIGHT + 1));
+            sleep(65 div (altitude div MIN_HEIGHT + 1));
         end;
         Console.CursorTop := original_cur_top;
         UpdScr;
