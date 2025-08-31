@@ -28,25 +28,29 @@ begin
     end
 end;
 
+function CursorIsAboveBound: boolean := (Console.WindowTop + Console.WindowHeight >= Cursor.Top);
+
 procedure Next1;
-const
-    BACKSPACE: string = #8#32#8;
-    DELAY: word = 330;
 begin
     ClrKeyBuffer;
-    var cycle: boolean;
-    repeat
-        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, DELAY);
-        if KeyAvail then break else write(cycle ? BACKSPACE : '>');
-        cycle := not cycle;
-    until False;
-    if cycle then write(BACKSPACE);
+    DoWithoutUpdScr(() ->
+    begin
+        UpdScr;
+        var cycle: boolean;
+        repeat
+            if System.Threading.SpinWait.SpinUntil(() -> KeyAvail, 330) then break
+            else if CursorIsAboveBound then
+            begin
+                write(cycle ? #8#32#8 : '>');
+                cycle := not cycle;
+            end;
+        until False;
+        if cycle then write(#8#32#8);
+    end);
     ClrKeyBuffer;
 end;
 
 procedure Next3;
-const
-    DELAY: byte = 240;
 begin
     writeln;
     if not Tutorial.AnimNextH.Shown then
@@ -57,12 +61,28 @@ begin
     end;
     TxtClr(Color.Gray);
     ClrKeyBuffer;
-    var len: byte;
-    repeat
-        System.Threading.SpinWait.SpinUntil(() -> KeyAvail, DELAY);
-        if KeyAvail or (len = 3) then ClearLine(False) else write('>');
-        if len = 3 then len := 0 else len += 1;
-    until KeyAvail;
+    DoWithoutUpdScr(() ->
+    begin
+        var len: byte;
+        repeat
+            if (BufWidth < MIN_WIDTH) then Console.BufferWidth := MIN_WIDTH;
+            System.Threading.SpinWait.SpinUntil(() -> KeyAvail, 230);
+            if CursorIsAboveBound then
+            begin
+                if (len = 3) then
+                begin
+                    ClearLine(False);
+                    len := 0;
+                end
+                else begin
+                    write('>');
+                    len += 1;
+                end;
+            end;
+        until KeyAvail;
+        ClearLine(False);
+        UpdScr;
+    end);
     if not Tutorial.AnimNextH.Shown then
     begin
         Cursor.GoTop(+1);
