@@ -52,13 +52,13 @@ end;
 
 procedure Next3;
 begin
-    writeln;
+    writelnx2;
     if not Tutorial.AnimNextH.Shown then
     begin
-        Cursor.GoTop(+1);
         Tutorial.Comment('любая клавиша чтобы продолжить');
-        Cursor.GoTop(-2);
+        Cursor.GoTop(-1);
     end;
+    Cursor.GoTop(-1);
     TxtClr(Color.Gray);
     ClrKeyBuffer;
     DoWithoutUpdScr(() ->
@@ -71,7 +71,7 @@ begin
             begin
                 if (len = 3) then
                 begin
-                    ClearLine(False);
+                    write(#8 * 3, ' ' * 3, #8 * 3);
                     len := 0;
                 end
                 else begin
