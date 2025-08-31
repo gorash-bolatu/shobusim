@@ -111,7 +111,7 @@ begin
                     _Log.Log('=== геймовер');
                     Anim.Next3;
                     TxtClr(Color.Red);
-                    writeln('G A M E   O V E R');
+                    writeln('GAME OVER'.JoinToString(' '));
                     BeepWait(700, 300);
                     BeepWait(600, 300);
                     BeepWait(450, 500);
@@ -134,8 +134,11 @@ begin
                         begin
                             _Log.Log('=== РЕСТАРТ');
                             TITLESCREEN;
+                        end
+                        else begin
+                            Achievements.DisplayAll;
+                            exit;
                         end;
-                        exit;
                     end;
                 end;
             until False;
