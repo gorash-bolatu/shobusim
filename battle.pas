@@ -429,7 +429,7 @@ begin
     BeepAsync(360, 400);
     var shown: string := Upscaled(-dmg, self_hp_max).PadRight(5);
     if (dmg > self_hp) then dmg := self_hp_max;
-    var critical: boolean := (dmg >= self_hp_max div 2);
+    var critical: boolean := (dmg >= self_hp_max div 3);
     if critical then CritHit(Color.Red);
     var squares: string := Instance.SQUARE * dmg;
     Throw(() ->
@@ -458,7 +458,7 @@ begin
     BeepAsync(400, 400);
     var shown: string := Upscaled(-dmg, enemy_hp_max).PadLeft(5);
     if (enemy_hp - dmg < 0) then dmg := enemy_hp;
-    var critical: boolean := (dmg >= self_hp_max div 2);
+    var critical: boolean := (dmg >= self_hp_max div 3);
     if critical then CritHit(Color.Magenta);
     var squares: string := Instance.SQUARE * dmg;
     Throw(() ->

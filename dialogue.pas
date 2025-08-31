@@ -72,7 +72,10 @@ type
         begin
             if DEBUGMODE then
                 if (phrases.Length = 0) then raise new Exception('НЕТ СТРОК В DIALOGUE.SAY()');
-            SetBoxWidth(phrases.Max.Length);
+            var longest_string: string := phrases.MaxBy(q -> q.Length);
+            SetBoxWidth(longest_string.Length);
+            if longest_string.EndsWith('-') then SetBoxWidth(BoxWidth - 4);
+            longest_string := nil;
             WriteActor(speaker);
             if DEBUGMODE then
                 if (BoxWidth + 3) > MIN_WIDTH then

@@ -216,10 +216,6 @@ begin
 end;
 
 procedure ReadCmd(prompt: string);
-const
-    NONALPHA: array of char = ('!', '"', '#', '№', '$', '%', '&', '''', '(', ')', '*',
-    '+', '-', ',', '.', ':', ';', '<', '=', '>', '?', '@', '^', '`', '{', '}', '~',
-    '_', '[', ']', '/', '|', '\', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
 var
     res: string;
 begin
@@ -264,9 +260,8 @@ begin
             res := '';
             break
         end;
-        for var r: integer := 1 to res.Length do
-            if NONALPHA.Contains(res[r]) then res[r] := #127;
-        res := res.Remove(#127).Trim.ToLower;
+        res := res.RegexReplace('[^\p{L}]', ''); // удаляет всё кроме букв
+        res := res.Trim.ToLower;
         while (res.Contains('  ')) do res := res.Replace('  ', ' ');
         res := res.Replace('ё', 'е').Replace('тся', 'ться');
         res := ParseCmd(res);
