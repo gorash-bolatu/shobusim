@@ -6,21 +6,32 @@ uses Scenes;
 
 function PART1: boolean;
 function PART2: boolean;
+procedure PART3;
+function PART4: boolean;
 var
+    Route: (SOLO, RITA, TRIP, ROMA);
+    TextedVasya, TextedRita, TextedRoma, TextedTrip: boolean;
     START_SCENE := Scenes.Link(
         new PlayableScene(PART1),
-        new PlayableScene(PART2));
+        new PlayableScene(PART2),
+        new Cutscene(PART3),
+        new PlayableScene(PART4));
 
 
 
 implementation
 
-uses Aliases, Procs, Chats, Inventory, Items, Menu, Anim, ButtonMashers, Dialogue,
+uses Aliases, Procs, Cursor, Chats, Inventory, Items, Menu, Anim, ButtonMashers, Dialogue,
     Actors, Achs, Matrix, Tutorial, Battle, _Settings;
 
-var
-    Route: (SOLO, RITA, TRIP, ROMA);
-    TextedVasya, TextedRita, TextedRoma: boolean;
+procedure RESET;
+begin
+    Route := SOLO;
+    TextedRita := False;
+    TextedRoma := False;
+    TextedVasya := False;
+    TextedTrip := False;
+end;
 
 {$REGION комната}
 function PART1: boolean;
@@ -28,14 +39,14 @@ var
     charger_location: byte := Random(7);
     broke_bed, broke_window, broke_box, broke_laptop, burned_laptop, broke_table, changed_clothes, charged_laptop,
     found_charger, tried_breaking_wardrobe, hit_table, watched_utub, torrenting_movies, played_cossacks,
-    played_megamuzhik, programmed, used_empty_hdd, saw_matrix, texted_trip, tried_texting_rita: boolean;
+    played_megamuzhik, programmed, used_empty_hdd, saw_matrix, tried_texting_rita: boolean;
     
     {$REGION чаты}
     procedure PrintChatPrompt;
     begin
         print('Кому ты напишешь?');
         if not TextedVasya then print('Васе?');
-        if not texted_trip then print('Трипу?');
+        if not TextedTrip then print('Трипу?');
         if not TextedRoma then
         begin
             print('Роме?');
@@ -76,7 +87,7 @@ var
                         writeln('По-видимому, сегодня у Васи не очень хороший день.');
                     end;
                 'TRIP':
-                    if texted_trip then writeln('Ты уже писал Трипу!') else
+                    if TextedTrip then writeln('Ты уже писал Трипу!') else
                     begin
                         cht := new Chat('ТРNПАН0С0М03');
                         cht.DrawTop;
@@ -99,7 +110,7 @@ var
                         end;
                         cht.Enter('Ок звучит неплохо давай');
                         writelnx2;
-                        texted_trip := True;
+                        TextedTrip := True;
                         if not TextedRoma then writeln('Ты договорился встретиться с Трипом у гаражей.');
                     end;
                 'ROMA', 'ROMA_ROMA':
@@ -112,12 +123,12 @@ var
                         cht.Enter('Что');
                         cht.Response('СЕГОДНЯ ЧЕТКАЯ ТУСА НА ПАРКОВКЕ', 'ГО');
                         cht.Enter('И что за туса');
-                        cht.Response('НУ БЛЯ ВСЕ НАШИ ПАЦАНЫ СОБИРАЮТСЯ', 'МУЗЛО БАДЯГА ДЕВКИ САСНЫЕ ВСЕ ДЕЛА');
+                        cht.Response('ИЛЬДАР ВСЕХ НАШИХ ПАЦАНОВ СОБИРАЕТ', 'МУЗЛО БАДЯГА ДЕВКИ САСНЫЕ ВСЕ ДЕЛА');
                         cht.Enter('Ну не знаю');
-                        cht.Response('ДА МЛЯ ПРИХОДИ НОРМ ТЕМА');
+                        cht.Response('ДА БЛЯ ПРИХОДИ НОРМ ТЕМА');
                         cht.Enter('Ладно');
                         cht.Response('ЗАЕБИСЬ ТАМ НА МЕСТЕ ВСТРЕТИМСЯ');
-                        if texted_trip then
+                        if TextedTrip then
                         begin
                             cht.Enter('Слушай а я с трипом уже договорился');
                             cht.Response('ООО НИШТЯК ОН ТОЖЕ ИДЕТ?');
@@ -461,10 +472,7 @@ var
 {$REGION комната}
 begin
     Result := False;
-    TextedRita := False;
-    TextedVasya := False;
-    TextedRoma := False;
-    Route := SOLO;
+    RESET;
     TxtClr(Color.White);
     writeln('Тебя зовут Саня Шобунен.');
     writeln('Ты живёшь в старенькой многоэтажке в московском районе Чертаново.');
@@ -681,7 +689,7 @@ begin
                     if broke_window then writeln('Ты открываешь окно и... выпрыгиваешь из него!')
                     else writeln('Ты разбегаешься и выпрыгиваешь из окна!');
                     writeln('Стоп, почему ты летишь с высоты седьмого этажа прямо на землю?');
-                    writeln('Кажись, это была не очень хорошая идея...');
+                    writeln('Видать, это была не очень хорошая идея...');
                     exit; // gameover
                 end;
             {-} 'GET_HDD', 'GET_HDD_BOX', 'GET_BOX_HDD':
@@ -749,7 +757,7 @@ begin
         end; // case end
     end; // while end
     if TextedRoma then Route := ROMA
-    else if texted_trip then Route := TRIP;
+    else if TextedTrip then Route := TRIP;
     Result := True;
 end;
 {$ENDREGION}
@@ -767,13 +775,13 @@ begin
     begin// while begin
         ReadCmd;
         case LastCmdResult of
-            {-}'CHECK', 'GET':
+            {-} 'CHECK', 'GET':
                 if opened_hatch then writeln('Возможно, стоит подняться наверх?')
                 else if Inventory.Has(Items.Shard) then
                     writeln('Люк на потолке... Можно попытаться открыть его осколком стекла!')
                 else writeln('Точно, зеркало! Вдруг с ним что-то можно сделать?..');
-            {-}'GET_DOG': writeln('Юпитер и так с тобой!');
-            {-}'CALL', 'PRESS', 'CALL_PRESS', 'PRESS_CALL':
+            {-} 'GET_DOG': writeln('Юпитер и так с тобой!');
+            {-} 'CALL', 'PRESS', 'CALL_PRESS', 'PRESS_CALL':
                 if tried_emergency_button then writeln('Никто не отвечает, сколько ты не жал бы на кнопку.')
                 else begin
                     if LastCmdResult.Equals('PRESS') then
@@ -785,15 +793,15 @@ begin
                     writeln('После этого никто не отвечает, сколько ты бы не жал на кнопку.');
                     tried_emergency_button := True;
                 end;
-            {-}'JUMP', 'BREAK', 'JUMP_LIFT', 'BREAK_LIFT':
+            {-} 'JUMP', 'BREAK', 'JUMP_LIFT', 'BREAK_LIFT':
             writeln('Ты прыгаешь в лифте несколько раз, но он никуда не двигается.');
-            {-}'BREAK_DOORS': writeln('Двери не поддаются!');
-            {-}'KISS_MIRROR':
+            {-} 'BREAK_DOORS': writeln('Двери не поддаются!');
+            {-} 'KISS_MIRROR':
                 begin
                     writeln('Ты... э... целуешь зеркало.');
                     writeln('Похоже, это нисколько не помогает тебе выбраться из лифта.');
                 end;
-            {-}'TAKEOFF_MIRROR', 'BREAK_DOG', 'BREAK_MIRROR', 'BREAK_MIRROR_DOG', 'BREAK_DOG_MIRROR', 'CUT_MIRROR',
+            {-} 'TAKEOFF_MIRROR', 'BREAK_DOG', 'BREAK_MIRROR', 'BREAK_MIRROR_DOG', 'BREAK_DOG_MIRROR', 'CUT_MIRROR',
             'THROW_DOG', 'THROW_MIRROR', 'THROW_MIRROR_DOG', 'THROW_DOG_MIRROR', 'GET_DOG_BREAK_MIRROR', 'GET_MIRROR',
             'BREAK_MIRROR_BOTTLE', 'BREAK_BOTTLE_MIRROR', 'THROW_MIRROR_BOTTLE', 'THROW_BOTTLE_MIRROR',
             'BREAK_MIRROR_COLA', 'BREAK_COLA_MIRROR', 'THROW_MIRROR_COLA', 'THROW_COLA_MIRROR',
@@ -813,7 +821,8 @@ begin
                         writeln('Оно с треском разбивается, а собака громко взвизгивает и падает на пол!');
                     end
                     else if LastCmdResult.Contains('COLA') or LastCmdResult.Contains('BOTTLE') then
-                        if Inventory.Has(Items.Cola) then println('Ты бросаешь бутылку с колой прямо в зеркало, и оно разбивается.')
+                        if Inventory.Has(Items.Cola) then
+                            println('Ты бросаешь бутылку с колой прямо в зеркало, и оно разбивается.')
                         else begin
                             writeln('Так не пойдёт. Нужно попробовать что-нибудь ещё.');
                             Tutorial.ShowCheckHint;
@@ -823,7 +832,7 @@ begin
                     writeln('С пола ты поднимаешь осколок стекла.');
                     Inventory.Obtain(Items.Shard);
                 end;
-            {-}'GO', 'GO_LIFT', 'GOUP', 'GOUP_LIFT', 'GO_HATCH', 'GOUP_HATCH', 'GO_HATCH_LIFT', 'GOUP_HATCH_LIFT',
+            {-} 'GO', 'GO_LIFT', 'GOUP', 'GOUP_LIFT', 'GO_HATCH', 'GOUP_HATCH', 'GO_HATCH_LIFT', 'GOUP_HATCH_LIFT',
             'GO_LIFT_HATCH', 'GOUP_LIFT_HATCH', 'CHECK_HATCH', 'GET_HATCH':
                 if opened_hatch then
                 begin
@@ -839,13 +848,13 @@ begin
                     writeln('Это не так просто - он чем-то закреплён.');
                     writeln('Если б только эти крепления можно было чем-то подрезать...');
                 end;
-            {-}'BREAK_HATCH':
+            {-} 'BREAK_HATCH':
                 if opened_hatch then writeln('Ты уже открыл люк - пора залезть наверх.') else
                 begin
                     writeln('Ты ударяешь по люку на потолке, но крепления не поддаются.');
                     writeln('Если б только их можно было чем-то подрезать...');
                 end;
-            {-}'OPEN_HATCH', 'CUT_HATCH', 'OPEN_ATTACH', 'BREAK_ATTACH', 'CUT_ATTACH', 'CHECK_ATTACH',
+            {-} 'OPEN_HATCH', 'CUT_HATCH', 'OPEN_ATTACH', 'BREAK_ATTACH', 'CUT_ATTACH', 'CHECK_ATTACH',
             'OPEN_ATTACH_HATCH', 'BREAK_ATTACH_HATCH', 'CUT_ATTACH_HATCH', 'CHECK_ATTACH_HATCH',
             'OPEN_HATCH_ATTACH', 'BREAK_HATCH_ATTACH', 'CUT_HATCH_ATTACH', 'CHECK_HATCH_ATTACH':
                 if opened_hatch then writeln('Ты уже открыл люк.')
@@ -876,9 +885,10 @@ end;
 
 {$REGION подъезд}
 function PART2: boolean;
+var
+    second_floor: boolean;
 begin
     Result := False;
-    var second_floor: boolean;
     TxtClr(Color.White);
     writeln('Чтобы выгулять Юпитера, нужно сначала попасть на улицу.');
     writeln('Перед тобой лестница, лифт и окно, в котором виднеется вечно серое Чертаново.');
@@ -932,31 +942,178 @@ begin
                 end;
         end;//case end
     end;//while end
+    Route := second_floor ? SOLO : RITA; // todo другой способ переключения рутов Соло и Риты?
+    Result := True;
+end;
+{$ENDREGION}
+
+{$REGION улица}
+procedure PART3;
+begin
     writeln('По пути ты встречаешь каких-то гопников, курящих у трансформаторной будки.');
     if TextedRoma then writeln('Ты не сразу узнаёшь в них друзей Ромы с района.')
-    else writeln('Они похожи на парней, с которыми часто тусуется один твой друг, Рома.');
+    else writeln('Эти трое похожи на парней, с которыми часто тусуется один твой друг, Рома.');
     Dialogue.Open;
     Dialogue.Say(Actors.Anon, 'О, Шобунен, ты, что ли?');
-    Dialogue.Say(Actors.Sanya, 'Э... Привет, чё как?');
+    Dialogue.Say(Actors.Sanya, 'Привет, чё как?');
     Dialogue.Say(Actors.Anon, 'Норм. Чё, идёшь на парковку?');
     if TextedRoma then
     begin
         Dialogue.Say(Actors.Sanya, 'Ага. Вы тоже туда на тусу?');
-        Dialogue.Say(Actors.Anon,
-           'Стоп, реально собрался? А нафиг ты с собакой? Хах...',
-           'Лан, пофиг, погнали, пора уже.');
+        Dialogue.Say(Actors.Anon, 'Стоп, реально собрался? А нафиг ты с собакой? Хах...');
+        Dialogue.Say(Actors.Anon, 'Лан, похуй, погнали, пора уже...');
         Dialogue.Close;
-        writeln('Парни уходят, и ты неловко увязываешься за ними.');
+        writeln('Пацаны уходят, и вы с Юпитером увязываетесь за ними.');
+        Anim.Next3;
+        writeln('По пути ты пытаешься вспомнить, а как их вообще зовут.');
+        writeln('Одетый в чёрное и скрывающий голову под рыбацкой шапочкой - это Влад.');
+        writeln('Кажись, Они с Ромой пытаются записывать и продвигать собственный рэп.');
+        writeln('Пока у них получается не очень, но они зовут это "андерграунд" и кайфуют с процесса.');
+        writeln('С собой Влад несёт пакет из супермаркета, в котором звенят бутылки.');
+        writeln('А забавный татарин со светлым кудрявым афро в стильном прикиде - это...');
+        Dialogue.Open;
+        Dialogue.Say(Actors.Sanya, 'А чё, вас всех тоже Рома позвал?');
+        Dialogue.Say(Actors.Vlad, 'Бля, не-е-е... Ромчик там будет... Но сёня Ильдар ебашит, на...');
+        Dialogue.Close;
+        writeln('Точно, Ильдар. Рома как раз говорил, что сегодня всех собирает он.');
+        writeln('Каким-то образом Ильдар всегда при деньгах и башляет за всех на вечеринках.');
+        writeln('Говорят, он мутит что-то на бирже с искусственным интеллектом, но это не точно...');
+        writeln('Ильдар несёт рюкзак на спине, из которого тоже доносится звон бутылок.');
+        Dialogue.Open;
+        Dialogue.Say(Actors.Sanya, 'А, Ильдар сегодня и организатор, и генеральный спонсор.');
+        Dialogue.Say(Actors.Ildar, 'Да-а-а, как обычно! Во, это на всех.');
+        Dialogue.Close;
+        writeln('Ильдар хлопает по рюкзаку и показывает на пакет Влада.');
+        Dialogue.Open;
+        Dialogue.Say(Actors.Ildar, 'Сань, помоги Владу донести--');
+        Dialogue.Say(Actors.Vlad, 'Да нах надо, ёпт! Мы сами... Ща уже, скоро...');
+        Dialogue.Close;
+        writeln('"Мы"? Да, ещё же третий чувак. Он тоже несёт небольшой пакет с припасами.');
+        writeln('Вообще, чем-то смахивает на тебя. Как же его зовут?..');
+        Dialogue.FastSay(Actors.Sanya, 'Понятно...');
+        writeln('Ты что-то не припомнишь, чтобы раньше его видел...');
+        Dialogue.FastSay(Actors.Anon, 'Хм?');
+        writeln('Он замечает, что ты в замешательстве на него пялишься, и протягивает руку.');
+        Dialogue.Open;
+        Dialogue.Say(Actors.Anon, 'Саша, да? Меня помнишь?');
+        writeln;
+        var sa: string := ReadInput('его имя');
+        Cursor.GoTop(-1);
+        var guess: (NONE, MIHA, MAZHOROV, GOAT) := NONE;
+        var non_alphanum_regex: string := '[^\p{L}\d\s]';
+        if (sa.Length > MIN_WIDTH - 6) then sa := 'Э-э-э...'
+        else begin
+            var miha_regex: Regex := new Regex('ми(ш|х)а[а-я]{0,2}');
+            var mazhorov_regex: Regex := new Regex('м.жоров');
+            var cameroon_regex: Regex := new Regex('камерунский.*коз(е|ё)л');
+            var sb: string := sa.RegexReplace(non_alphanum_regex, '').ToLower;
+            if miha_regex.IsMatch(sb) then 
+            begin
+                sa := miha_regex.&Match(sb).Value.ToLower;
+                sa[1] := sa[1].ToUpper;
+                if cameroon_regex.IsMatch(sb) then sa += ' "Камерунский Козёл"';
+                if mazhorov_regex.IsMatch(sb) then sa += ' Мажоров';
+            end
+            else if mazhorov_regex.IsMatch(sb) then sa := 'Мажоров'
+            else if cameroon_regex.IsMatch(sb) then sa := 'Камерунский Козёл'
+            else sa := System.Globalization.CultureInfo.GetCultureInfo(
+                            'ru-RU').TextInfo.ToTitleCase(sa.ToLower);
+            if cameroon_regex.IsMatch(sb) then guess := GOAT
+            else if mazhorov_regex.IsMatch(sb) then guess := MAZHOROV
+            else if miha_regex.IsMatch(sb) then guess := MIHA;
+            miha_regex := nil;
+            mazhorov_regex := nil;
+            cameroon_regex := nil;
+            sb := nil;
+        end;
+        Dialogue.Say(Actors.Sanya, sa + '?');
+        case guess of
+            {-} NONE:
+                if sa.Matches(non_alphanum_regex,
+                        RegexOptions.IgnorePatternWhitespace).Count > (sa.Length div 7) then
+                begin
+                    Dialogue.Say(Actors.Ildar, 'Ха-ха-хах, жесть! Ты как это своим ртом щас изрёк вообще?!');
+                    Dialogue.Say(Actors.Vlad, 'Бля, внатуре...');
+                    Dialogue.Say(Actors.Miha, 'Эт было сильно. Я Миха Мажоров. Будем знакомы.');
+                end
+                else Dialogue.Say(Actors.Miha, 'Ну почти. Я Миха Мажоров. Будем знакомы.');
+            {-} MIHA, MAZHOROV: 
+                begin
+                    Dialogue.Say(Actors.Miha,
+                        (guess = MIHA ? 'Да, Мажоров.' : 'Можно просто Миха.'),
+                        'Вообще-то, про "помнишь" я тебя подколол. Мы ж не виделись раньше.',
+                        'Откуда ты меня знаешь?');
+                    Dialogue.Say(Actors.Sanya, 'Не знаю, наверное, кто-то мне про тебя говорил...');
+                    Achs.SayMyName.Achieve;
+                end;
+            {-} GOAT:
+                begin
+                    Dialogue.Say(Actors.Miha, '...');
+                    Dialogue.Say(Actors.Ildar, '...');
+                    Dialogue.Say(Actors.Sanya, '..?');
+                    Dialogue.Say(Actors.Vlad, 'Ха-а-а, Сань, хуя ты шаришь!');
+                    Dialogue.Say(Actors.Miha, 'Так-то меня Миха зовут. Ну, будем знакомы.');
+                    Achs.SayMyName.Achieve;
+                end;
+        end;
+        sa := nil;
+        if (guess = GOAT) then
+        begin
+            Dialogue.Close;
+            writeln('Ты пожимаешь Михе руку, и вы вчетвером обсуждаете предстоящую пати.');
+            writeln('Как вдруг!..');
+            Dialogue.Open;
+        end
+        else begin
+            Dialogue.Say(Actors.Vlad, 'Эй-ки-эй Камерунскиий Козёл!');
+            Dialogue.Say(Actors.Miha, 'Да блин, Влад...');
+            Dialogue.Say(Actors.Sanya, 'Чего? Какой ещё козёл?');
+            Dialogue.Say(Actors.Miha, 'Да забей, он уже из пакета бахнул - к тусовке "готовится".');
+            Dialogue.Say(Actors.Ildar, 'Ха-ха, не-е-е, Сань! Это Михин секретный рэперский ник.');
+            Dialogue.Say(Actors.Sanya, 'В смысле? Ты тоже рэпер?');
+            Dialogue.Say(Actors.Miha, 'Не... Я, короче... Под этим псевдонимом Влада с Ромой продюсирую...');
+            Dialogue.Say(Actors.Vlad, 'Продюсируешь их рэп? Это как, деньгами? А чё не Ильдар?');
+            Dialogue.Say(Actors.Vlad,
+                'Да бля, не, это не про бабки... Да и какие бабки, у нас андер, ёпт!',
+                'Михан нам биты пишет, понял? Треки сводит, короч... В инет там выкладывает, всё такое...');
+            Dialogue.Say(Actors.Sanya, 'А почему Камерунский Коз--');
+        end;
     end
     else begin
         Dialogue.Say(Actors.Sanya, 'Парковку?');
         Dialogue.Say(Actors.Anon, 'Понятно...');
         Dialogue.Close;
-        writeln('Парни шустро пожимают тебе руки и продолжают говорить о своём.');
-        writeln('Ты пожимаешь плечами и идёшь дальше.');
+        writeln('Парни шустро пожимают тебе руки и уходят, продолжая говорить о своём.');
+        writeln('Ты пожимаешь плечами и тоже собираешься идти, как вдруг!..');
+        Dialogue.Open;
     end;
-    Route := second_floor ? SOLO : RITA;
-    // todo другой способ переключения рутов Соло и Риты?
+    Dialogue.Say(Actors.Kostya, 'СА-А-АНЯ!');
+    Dialogue.Close;
+    writeln('О нет, только не он. Костя Сергеев.');
+    writeln('На районе он снискал дурную славу странного типа, которого все обходят стороной.');
+    writeln('Но поскольку он твой давний знакомый, вам приходится пересекаться часто.');
+    writeln('Говорят, в школе Костя всех задирал, и в ответ задирали его...');
+    writeln('В какой-то момент он стал вымещать агрессию на других и творить безумные вещи.');
+    writeln('Раньше у вас были... идеологические разногласия? И в каком-то смысле, личные счёты...');
+    writeln('Возможно, поэтому в последнее время Сергеев переключился конкретно на тебя.');
+    Dialogue.FastSay(Actors.Kostya, 'ОПЯТЬ ТЫ, ШОБУНЕН. ХЕНЭК! УПЫРЬ! АР-Р-Р!!!');
+    writeln('Как обычно, ты не понимаешь, что это значит, и пытаешься улизнуть.');
+    writeln('Но Костя не отстаёт от тебя и не даёт проходу. Более того, начинает махать кулаками!');
+    writeln('Ты пытаешься его успокоить, но всё тщетно.');
+    if TextedRoma then
+    begin
+        writeln('Ты оборачиваешься и видишь, что пацаны вместо поддержки с предвкушением ждут махача.');
+        Dialogue.FastSay(Actors.Vlad, 'Саня, не ссы! Ебашь раз на раз, на мужика!');
+        writeln('Честный бой один на один. Логично. Тогда перед ребятами точно нельзя в грязь лицом.');
+    end;
+    writeln('Придётся драться!..');
+end;
+{$ENDREGION}
+
+{$REGION битва}
+function PART4: boolean;
+begin
+    // TODO!
     Result := True;
 end;
 {$ENDREGION}
