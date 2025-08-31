@@ -88,7 +88,6 @@ begin
             var top: integer := Cursor.Top;
             foreach ach: Achievement in ListOfAll.Where(q -> not q.fAchieved) do
             begin
-                if ach.fName.Contains('ОРА') then continue; // todo убрать когда будет рут трипа
                 TxtClr(Color.Cyan);
                 writeln(TAB, '} ', ach.fName);
                 TxtClr(Color.DarkCyan);
@@ -98,8 +97,7 @@ begin
                     UpdScr;
                     TxtClr(Color.DarkGreen);
                     write(TAB);
-                    var w: integer := MIN_WIDTH - Cursor.Left;
-                    writeln(WordWrap(ach.fWalkthrough, w, NewLine + TAB));
+                    writeln(WordWrap(ach.fWalkthrough, (MIN_WIDTH - Cursor.Left), NewLine + TAB));
                 end;
                 if (Cursor.Top - top > Console.WindowHeight div 2) then
                 begin
@@ -122,9 +120,11 @@ end;
 initialization
 
 finalization
-    if (ListOfAll = nil) then exit;
-    foreach i: Achievement in ListOfAll do i.Destroy;
-    ListOfAll.Clear;
-    ListOfAll := nil;
+    if (ListOfAll <> nil) then
+    begin
+        foreach i: Achievement in ListOfAll do i.Destroy;
+        ListOfAll.Clear;
+        ListOfAll := nil;
+    end;
 
 end.
