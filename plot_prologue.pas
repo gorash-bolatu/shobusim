@@ -664,7 +664,7 @@ begin
                     writeln('Через мгновение руку пронзает боль, и ты осознаёшь, что это была не лучшая идея.');
                     writeln('Тогда ты пытаешься опрокинуть шкаф, но он оказывается слишком тяжёлым.');
                     writeln('В ярости ты начинаешь молотить по шкафу руками со всех сторон!');
-                    Dialogue.FastSay(Actors.Sanya, 'ОРАОРАОРАОРАОРАОРАОРАОРАОРАОРАОРА!!!');
+                    Dialogue.FastSay(Sanya, 'ОРАОРАОРАОРАОРАОРАОРАОРАОРАОРАОРА!!!');
                     writeln('Шкафу всё равно.');
                     writeln('...Ты решаешь оставить эту затею.');
                     tried_breaking_wardrobe := True;
@@ -954,14 +954,14 @@ begin
     if TextedRoma then writeln('Ты не сразу узнаёшь в них друзей Ромы с района.')
     else writeln('Эти трое похожи на парней, с которыми часто тусуется один твой друг, Рома.');
     Dialogue.Open;
-    Dialogue.Say(Actors.Anon, 'О, Шобунен, ты, что ли?');
-    Dialogue.Say(Actors.Sanya, 'Привет, чё как?');
-    Dialogue.Say(Actors.Anon, 'Норм. Чё, идёшь на парковку?');
+    Dialogue.Say(Anon, 'О, Шобунен, ты, что ли?');
+    Dialogue.Say(Sanya, 'Привет, чё как?');
+    Dialogue.Say(Anon, 'Норм. Чё, идёшь на парковку?');
     if TextedRoma then
     begin
-        Dialogue.Say(Actors.Sanya, 'Ага. Вы тоже туда на тусу?');
-        Dialogue.Say(Actors.Anon, 'Стоп, реально собрался? А нафиг ты с собакой? Хах...');
-        Dialogue.Say(Actors.Anon, 'Лан, похуй, погнали, пора уже...');
+        Dialogue.Say(Sanya, 'Ага. Вы тоже туда на тусу?');
+        Dialogue.Say(Anon, 'Стоп, реально собрался? А нафиг ты с собакой? Хах...');
+        Dialogue.Say(Anon, 'Лан, похуй, погнали, пора уже...');
         Dialogue.Close;
         writeln('Пацаны уходят, и вы с Юпитером увязываетесь за ними.');
         Anim.Next3;
@@ -972,30 +972,30 @@ begin
         writeln('С собой Влад несёт пакет из супермаркета, в котором звенят бутылки.');
         writeln('А забавный татарин со светлым кудрявым афро в стильном прикиде - это...');
         Dialogue.Open;
-        Dialogue.Say(Actors.Sanya, 'А чё, вас всех тоже Рома позвал?');
-        Dialogue.Say(Actors.Vlad, 'Бля, не-е-е... Ромчик там будет... Но сёня Ильдар ебашит, на...');
+        Dialogue.Say(Sanya, 'А чё, вас всех тоже Рома позвал?');
+        Dialogue.Say(Vlad, 'Бля, не-е-е... Ромчик там будет... Но сёня Ильдар ебашит, на...');
         Dialogue.Close;
         writeln('Точно, Ильдар. Рома как раз говорил, что сегодня всех собирает он.');
         writeln('Каким-то образом Ильдар всегда при деньгах и башляет за всех на вечеринках.');
         writeln('Говорят, он мутит что-то на бирже с искусственным интеллектом, но это не точно...');
         writeln('Ильдар несёт рюкзак на спине, из которого тоже доносится звон бутылок.');
         Dialogue.Open;
-        Dialogue.Say(Actors.Sanya, 'А, Ильдар сегодня и организатор, и генеральный спонсор.');
-        Dialogue.Say(Actors.Ildar, 'Да-а-а, как обычно! Во, это на всех.');
+        Dialogue.Say(Sanya, 'А, Ильдар сегодня и организатор, и генеральный спонсор.');
+        Dialogue.Say(Ildar, 'Да-а-а, как обычно! Во, это на всех.');
         Dialogue.Close;
         writeln('Ильдар хлопает по рюкзаку и показывает на пакет Влада.');
         Dialogue.Open;
-        Dialogue.Say(Actors.Ildar, 'Сань, помоги Владу донести--');
-        Dialogue.Say(Actors.Vlad, 'Да нах надо, ёпт! Мы сами... Ща уже, скоро...');
+        Dialogue.Say(Ildar, 'Сань, помоги Владу донести--');
+        Dialogue.Say(Vlad, 'Да нах надо, ёпт! Мы сами... Ща уже, скоро...');
         Dialogue.Close;
         writeln('"Мы"? Да, ещё же третий чувак. Он тоже несёт небольшой пакет с припасами.');
         writeln('Вообще, чем-то смахивает на тебя. Как же его зовут?..');
-        Dialogue.FastSay(Actors.Sanya, 'Понятно...');
+        Dialogue.FastSay(Sanya, 'Понятно...');
         writeln('Ты что-то не припомнишь, чтобы раньше его видел...');
-        Dialogue.FastSay(Actors.Anon, 'Хм?');
+        Dialogue.FastSay(Anon, 'Хм?');
         writeln('Он замечает, что ты в замешательстве на него пялишься, и протягивает руку.');
         Dialogue.Open;
-        Dialogue.Say(Actors.Anon, 'Саша, да? Меня помнишь?');
+        Dialogue.Say(Anon, 'Саша, да? Меня помнишь?');
         writeln;
         var sa: string := ReadInput('его имя');
         Cursor.GoTop(-1);
@@ -1026,33 +1026,33 @@ begin
             cameroon_regex := nil;
             sb := nil;
         end;
-        Dialogue.Say(Actors.Sanya, sa + '?');
+        Dialogue.Say(Sanya, sa + '?');
         case guess of
             {-} NONE:
                 if sa.Matches(non_alphanum_regex,
                         RegexOptions.IgnorePatternWhitespace).Count > (sa.Length div 7) then
                 begin
-                    Dialogue.Say(Actors.Ildar, 'Ха-ха-хах, жесть! Ты как это своим ртом щас изрёк вообще?!');
-                    Dialogue.Say(Actors.Vlad, 'Бля, внатуре...');
-                    Dialogue.Say(Actors.Miha, 'Эт было сильно. Я Миха Мажоров. Будем знакомы.');
+                    Dialogue.Say(Ildar, 'Ха-ха-хах, жесть! Ты как это своим ртом щас изрёк вообще?!');
+                    Dialogue.Say(Vlad, 'Бля, внатуре...');
+                    Dialogue.Say(Miha, 'Эт было сильно. Я Миха Мажоров. Будем знакомы.');
                 end
-                else Dialogue.Say(Actors.Miha, 'Ну почти. Я Миха Мажоров. Будем знакомы.');
+                else Dialogue.Say(Miha, 'Ну почти. Я Миха Мажоров. Будем знакомы.');
             {-} MIHA, MAZHOROV: 
                 begin
-                    Dialogue.Say(Actors.Miha,
+                    Dialogue.Say(Miha,
                         (guess = MIHA ? 'Да, Мажоров.' : 'Можно просто Миха.'),
                         'Вообще-то, про "помнишь" я тебя подколол. Мы ж не виделись раньше.',
                         'Откуда ты меня знаешь?');
-                    Dialogue.Say(Actors.Sanya, 'Не знаю, наверное, кто-то мне про тебя говорил...');
+                    Dialogue.Say(Sanya, 'Не знаю, наверное, кто-то мне про тебя говорил...');
                     Achs.SayMyName.Achieve;
                 end;
             {-} GOAT:
                 begin
-                    Dialogue.Say(Actors.Miha, '...');
-                    Dialogue.Say(Actors.Ildar, '...');
-                    Dialogue.Say(Actors.Sanya, '..?');
-                    Dialogue.Say(Actors.Vlad, 'Ха-а-а, Сань, хуя ты шаришь!');
-                    Dialogue.Say(Actors.Miha, 'Так-то меня Миха зовут. Ну, будем знакомы.');
+                    Dialogue.Say(Miha, '...');
+                    Dialogue.Say(Ildar, '...');
+                    Dialogue.Say(Sanya, '..?');
+                    Dialogue.Say(Vlad, 'Ха-а-а, Сань, хуя ты шаришь!');
+                    Dialogue.Say(Miha, 'Так-то меня Миха зовут. Ну, будем знакомы.');
                     Achs.SayMyName.Achieve;
                 end;
         end;
@@ -1065,29 +1065,29 @@ begin
             Dialogue.Open;
         end
         else begin
-            Dialogue.Say(Actors.Vlad, 'Эй-ки-эй Камерунскиий Козёл!');
-            Dialogue.Say(Actors.Miha, 'Да блин, Влад...');
-            Dialogue.Say(Actors.Sanya, 'Чего? Какой ещё козёл?');
-            Dialogue.Say(Actors.Miha, 'Да забей, он уже из пакета бахнул - к тусовке "готовится".');
-            Dialogue.Say(Actors.Ildar, 'Ха-ха, не-е-е, Сань! Это Михин секретный рэперский ник.');
-            Dialogue.Say(Actors.Sanya, 'В смысле? Ты тоже рэпер?');
-            Dialogue.Say(Actors.Miha, 'Не... Я, короче... Под этим псевдонимом Влада с Ромой продюсирую...');
-            Dialogue.Say(Actors.Vlad, 'Продюсируешь их рэп? Это как, деньгами? А чё не Ильдар?');
-            Dialogue.Say(Actors.Vlad,
+            Dialogue.Say(Vlad, 'Эй-ки-эй Камерунскиий Козёл!');
+            Dialogue.Say(Miha, 'Да блин, Влад...');
+            Dialogue.Say(Sanya, 'Чего? Какой ещё козёл?');
+            Dialogue.Say(Miha, 'Да забей, он уже из пакета бахнул - к тусовке "готовится".');
+            Dialogue.Say(Ildar, 'Ха-ха, не-е-е, Сань! Это Михин секретный рэперский ник.');
+            Dialogue.Say(Sanya, 'В смысле? Ты тоже рэпер?');
+            Dialogue.Say(Miha, 'Не... Я, короче... Под этим псевдонимом Влада с Ромой продюсирую...');
+            Dialogue.Say(Vlad, 'Продюсируешь их рэп? Это как, деньгами? А чё не Ильдар?');
+            Dialogue.Say(Vlad,
                 'Да бля, не, это не про бабки... Да и какие бабки, у нас андер, ёпт!',
                 'Михан нам биты пишет, понял? Треки сводит, короч... В инет там выкладывает, всё такое...');
-            Dialogue.Say(Actors.Sanya, 'А почему Камерунский Коз--');
+            Dialogue.Say(Sanya, 'А почему Камерунский Коз--');
         end;
     end
     else begin
-        Dialogue.Say(Actors.Sanya, 'Парковку?');
-        Dialogue.Say(Actors.Anon, 'Понятно...');
+        Dialogue.Say(Sanya, 'Парковку?');
+        Dialogue.Say(Anon, 'Понятно...');
         Dialogue.Close;
         writeln('Парни шустро пожимают тебе руки и уходят, продолжая говорить о своём.');
         writeln('Ты пожимаешь плечами и тоже собираешься идти, как вдруг!..');
         Dialogue.Open;
     end;
-    Dialogue.Say(Actors.Kostya, 'СА-А-АНЯ!');
+    Dialogue.Say(Kostya, 'СА-А-АНЯ!');
     Dialogue.Close;
     writeln('О нет, только не он. Костя Сергеев.');
     writeln('На районе он снискал дурную славу странного типа, которого все обходят стороной.');
@@ -1096,15 +1096,15 @@ begin
     writeln('В какой-то момент он стал вымещать агрессию на других и творить безумные вещи.');
     writeln('Раньше у вас были... идеологические разногласия? И в каком-то смысле, личные счёты...');
     writeln('Возможно, поэтому в последнее время Сергеев переключился конкретно на тебя.');
-    Dialogue.FastSay(Actors.Kostya, 'ОПЯТЬ ТЫ, ШОБУНЕН. ХЕНЭК! УПЫРЬ! АР-Р-Р!!!');
+    Dialogue.FastSay(Kostya, 'ОПЯТЬ ТЫ, ШОБУНЕН. ХЕНЭК! УПЫРЬ! АР-Р-Р!!!');
     writeln('Как обычно, ты не понимаешь, что это значит, и пытаешься улизнуть.');
     writeln('Но Костя не отстаёт от тебя и не даёт проходу. Более того, начинает махать кулаками!');
     writeln('Ты пытаешься его успокоить, но всё тщетно.');
     if TextedRoma then
     begin
-        writeln('Ты оборачиваешься и видишь, что пацаны вместо поддержки с предвкушением ждут махача.');
-        Dialogue.FastSay(Actors.Vlad, 'Саня, не ссы! Ебашь раз на раз, на мужика!');
-        writeln('Честный бой один на один. Логично. Тогда перед ребятами точно нельзя в грязь лицом.');
+        writeln('Обернувшись к пацанам, ты видишь, как они с предвкушением ждут махача.');
+        Dialogue.FastSay(Vlad, 'Саня, не ссы! Ебашь раз на раз, на мужика!');
+        writeln('Честный бой один на один. Логично. Тогда перед ребятами точно нельзя упасть в грязь лицом.');
     end;
     writeln('Придётся драться!..');
 end;
@@ -1113,7 +1113,7 @@ end;
 {$REGION битва}
 function PART4: boolean;
 begin
-    // TODO!
+    Battle.Start();
     Result := True;
 end;
 {$ENDREGION}

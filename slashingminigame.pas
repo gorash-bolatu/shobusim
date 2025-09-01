@@ -449,8 +449,8 @@ begin
         health_line := Cursor.Top;
         DrawHealthbar;
         Cursor.SetLeft(1);
-        TxtClr(Actors.Sanya.color);
-        print(Actors.Sanya.name.ToUpper);
+        TxtClr(Sanya.color);
+        print(Sanya.name.ToUpper);
         BgClr(Color.Gray);
         write(' ' * health_cap);
         TxtClr(Color.Red);

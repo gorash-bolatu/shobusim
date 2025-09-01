@@ -528,7 +528,7 @@ function ChosenItem: Item? := current.itemres;
 
 procedure Start(const enemy: Actor; hp_self: byte; hp_enemy: byte);
 begin
-    current := new Instance(Actors.Sanya.name.ToUpper, hp_self, enemy.name.ToUpper, hp_enemy);
+    current := new Instance(Sanya.name.ToUpper, hp_self, enemy.name.ToUpper, hp_enemy);
     current.Visualize;
 end;
 

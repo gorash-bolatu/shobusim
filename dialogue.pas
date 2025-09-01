@@ -133,7 +133,7 @@ type
             SetBoxWidth(LEN);
             for var k: boolean := False to True do
             begin
-                WriteActor(k ? Actors.Sanya : Actors.Kostya);
+                WriteActor(k ? Sanya : Kostya);
                 TxtClr(Color.White);
                 writeln('├', '─' * NameWidth, '┴', '─' * (BoxWidth - NameWidth - 1), '┐');
                 writeln('│', ' ' * BoxWidth, '│');
@@ -316,8 +316,8 @@ end;
 procedure Echoes;
 begin
     Open;
-    current.Echo(Actors.Sanya, 'Грррр...', 'КОООСТЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ!!!');
-    current.Echo(Actors.Kostya, 'СССССАААНЯ!');
+    current.Echo(Sanya, 'Грррр...', 'КОООСТЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ!!!');
+    current.Echo(Kostya, 'СССССАААНЯ!');
     Close;
 end;
 
